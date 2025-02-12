@@ -1,0 +1,100 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation Template to Deploy FastAPI Backend on EC2
+
+Resources:
+  # EC2 instance to host the FastAPI backend
+  ResearchGraphInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      Tags:
+          - Key: Name
+            Value: research-graph-1
+      InstanceType: t2.micro
+      ImageId: ami-0c614dee691cbbf37  # Amazon Linux 2 (Update for your region)
+      KeyName: research-graph-agent-1-key  
+      SecurityGroups:
+        - !Ref BackendSecurityGroup
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: true
+          DeviceIndex: 0
+          GroupSet:
+            - !Ref BackendSecurityGroup
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      CreditSpecification:
+        CPUCredits: standard
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          sudo yum update -y
+          sudo yum install -y git python3-pip
+          sudo pip3 install virtualenv
+          cd /home/ec2-user
+          git clone https://github.com/danielnashed/ReSearchGraph_1.git
+          cd ReSearchGraph_1/backend
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+          nohup uvicorn main:app --host 0.0.0.0 --port 8000 &
+
+  # Security group to allow HTTP and SSH traffic
+  BackendSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow HTTP and SSH
+      VpcId: vpc-0b42e7320ad795208
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8000
+          ToPort: 8000
+          CidrIp: 0.0.0.0/0
+
+  # Allocate an Elastic IP
+  ResearchGraphEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc  # Use the VPC domain for EIP allocation
+
+  # Associate the Elastic IP with the EC2 instance
+  ResearchGraphEIPAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      InstanceId: !Ref ResearchGraphInstance
+      EIP: !Ref ResearchGraphEIP
+
+  # IAM role for the EC2 instance
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref EC2InstanceRole
+
+  # IAM role policy for the EC2 instance
+  EC2InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: GitHubActionsPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:*
+                  - ec2:*
+                Resource: "*"
+
+Outputs:
+  EC2PublicIP:
+    Description: "Public IP address of the EC2 instance"
+    Value: !GetAtt ResearchGraphInstance.PublicIp
