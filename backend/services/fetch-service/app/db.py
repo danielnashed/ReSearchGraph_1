@@ -7,8 +7,9 @@ from pathlib import Path
 from .models import UserDocument  # Import all models here
 
 # Load environment variables from local .env file
-dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
-load_dotenv(dotenv_path)
+# dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
+# load_dotenv(dotenv_path)
+load_dotenv('.env')
 
 # MongoDB Atlas connection URI from environment variable
 connection_string = os.getenv("MONGODB_URI")
