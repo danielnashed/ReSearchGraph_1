@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
-from app.crud import UserCRUD as CRUD
+from ..crud import UserCRUD as CRUD
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
