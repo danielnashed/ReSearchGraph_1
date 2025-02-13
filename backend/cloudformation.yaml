@@ -12,13 +12,12 @@ Resources:
       InstanceType: t2.micro
       ImageId: ami-0c614dee691cbbf37  # Amazon Linux 2 (Update for your region)
       KeyName: research-graph-agent-1-key  
-      SecurityGroups:
-        - !Ref BackendSecurityGroup
       NetworkInterfaces:
-        - AssociatePublicIpAddress: true
-          DeviceIndex: 0
-          GroupSet:
-            - !Ref BackendSecurityGroup
+      - AssociatePublicIpAddress: true
+        DeviceIndex: 0
+        SubnetId: subnet-0753052fb9ead6be0
+        GroupSet:
+          - !Ref BackendSecurityGroup
       IamInstanceProfile: !Ref EC2InstanceProfile
       CreditSpecification:
         CPUCredits: standard
@@ -34,7 +33,11 @@ Resources:
           python3 -m venv venv
           source venv/bin/activate
           pip install -r requirements.txt
-          nohup uvicorn main:app --host 0.0.0.0 --port 8000 &
+          nohup uvicorn services.fetch-service.main:app --host 0.0.0.0 --port 8000 &
+          nohup uvicorn services.embed-service.main:app --host 0.0.0.0 --port 8001 &
+          nohup uvicorn services.cluster-service.main:app --host 0.0.0.0 --port 8002 &
+          nohup uvicorn services.graph-service.main:app --host 0.0.0.0 --port 8003 &
+          nohup uvicorn services.visualize-service.main:app --host 0.0.0.0 --port 8004 &
 
   # Security group to allow HTTP and SSH traffic
   BackendSecurityGroup:
@@ -49,7 +52,7 @@ Resources:
           CidrIp: 0.0.0.0/0
         - IpProtocol: tcp
           FromPort: 8000
-          ToPort: 8000
+          ToPort: 8004
           CidrIp: 0.0.0.0/0
 
   # Allocate an Elastic IP
@@ -92,9 +95,158 @@ Resources:
                 Action:
                   - s3:*
                   - ec2:*
+                  - sqs:*
+                  - events:*
                 Resource: "*"
 
+  # 1. Create the REST API
+  FetchServiceAPI:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: "FetchServiceAPI"
+      Description: "API Gateway to forward requests to EC2"
+
+  # 2. Create the resource (/fetch-papers)
+  FetchServiceResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt FetchServiceAPI.RootResourceId
+      PathPart: "fetch-papers"
+      RestApiId: !Ref FetchServiceAPI
+
+  # 3. Define the POST method
+  FetchServiceMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      ResourceId: !Ref FetchServiceResource
+      RestApiId: !Ref FetchServiceAPI
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: HTTP
+        Uri: !Sub "http://${ResearchGraphEIP}:8000/fetch-papers"  # Your EC2 HTTP endpoint
+        PassthroughBehavior: WHEN_NO_MATCH
+
+  # 4. Deploy the API (create a stage)
+  FetchServiceDeployment:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId: !Ref FetchServiceAPI
+      StageName: "prod"
+    DependsOn: FetchServiceMethod
+
+  # IAM Role for EventBridge to call API Destination
+  FetchServiceEventBridgeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: FetchServiceEventBridgePolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: "events:InvokeApiDestination"
+                Resource: !GetAtt FetchServiceAPIDestination.Arn  # Allow invoking API Destination
+
+  # EventBridge rule to trigger fetch-service (cron job)
+  FetchServiceEventBridgeRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: FetchServiceScheduledRule
+      ScheduleExpression: cron(0 9 * * ? *)  # Run every day at 9 AM UTC
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt FetchServiceAPIDestination.Arn
+          Id: FetchServiceTarget
+          RoleArn: !GetAtt FetchServiceEventBridgeRole.Arn
+
+  # API Destination (for calling an external HTTP API)
+  FetchServiceAPIDestination:
+    Type: AWS::Events::ApiDestination
+    Properties:
+      Name: FetchServiceAPIDestination
+      ConnectionArn: !GetAtt FetchServiceConnection.Arn
+      InvocationEndpoint: !Sub "https://${FetchServiceAPI}.execute-api.${AWS::Region}.amazonaws.com/prod/fetch-papers"
+      HttpMethod: POST
+      InvocationRateLimitPerSecond: 1
+
+  # API Destination connection (for authentication if needed)
+  FetchServiceConnection:
+    Type: AWS::Events::Connection
+    Properties:
+      AuthorizationType: BASIC  # Use BASIC if authentication is needed
+      Name: FetchServiceConnection
+      AuthParameters:
+        BasicAuthParameters:
+          Username: 
+            Fn::Sub: arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:research-graph-agent-G8SCRk:username
+          Password:
+            Fn::Sub: arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:research-graph-agent-G8SCRk:password
+
+  EmbedServiceQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: embed-service-queue
+
+  ClusterServiceQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: cluster-service-queue
+
+  GraphServiceQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: graph-service-queue
+
+  VisualizeServiceQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: visualize-service-queue
+
+  # S3 Bucket for Research Graph data
+  ResearchGraphS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub research-graph-storage-${AWS::AccountId}
+      AccessControl: Private
+
 Outputs:
-  EC2PublicIP:
-    Description: "Public IP address of the EC2 instance"
-    Value: !GetAtt ResearchGraphInstance.PublicIp
+  # Output the EC2 instance public IP address (Elastic IP)
+  EC2InstancePublicIP:
+    Description: "The static public IP address of the EC2 instance"
+    Value: !Ref ResearchGraphEIP
+
+  # Output the S3 bucket name
+  S3BucketName:
+    Description: "The name of the S3 bucket for research graph data"
+    Value: !Ref ResearchGraphS3Bucket
+
+  # Output the EventBridge Rule ARN (for scheduler)
+  EventBridgeScheduler:
+    Description: "The ARN of the EventBridge scheduler"
+    Value: !GetAtt FetchServiceEventBridgeRule.Arn
+
+  # Output the URLs of the SQS queues
+  EmbedServiceQueueURL:
+    Description: "The URL of the Embed Service SQS queue"
+    Value: !Ref EmbedServiceQueue
+
+  ClusterServiceQueueURL:
+    Description: "The URL of the Cluster Service SQS queue"
+    Value: !Ref ClusterServiceQueue
+
+  GraphServiceQueueURL:
+    Description: "The URL of the Graph Service SQS queue"
+    Value: !Ref GraphServiceQueue
+
+  VisualizeServiceQueueURL:
+    Description: "The URL of the Visualize Service SQS queue"
+    Value: !Ref VisualizeServiceQueue
