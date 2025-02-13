@@ -16,4 +16,4 @@ async def on_startup():
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to Execution Agent API!"}
+    return {"message": "Welcome to Visualize Service API!"}

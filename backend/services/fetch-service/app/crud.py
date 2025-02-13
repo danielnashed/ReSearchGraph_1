@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional, List
-from .models import UserDocument
+from .models import UserDocument, PaperDocument
 from fastapi import HTTPException
 from bson import ObjectId
 from .db import get_next_sequence_value
@@ -28,3 +28,26 @@ class UserCRUD():
             await existing_user.delete()
             return {"message": "User deleted"}
         return {"message": "User not found"}
+    
+
+class paperCRUD():
+    # Create a new paper
+    @staticmethod
+    async def create_paper(paper: dict) -> PaperDocument:
+        # Ensure the user exists
+        user_id = paper.get("user_id")
+        user = await UserCRUD.get_user_by_id(ObjectId(user_id))
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        new_paper = PaperDocument(user_id=user_id,
+                                    arxiv_id=paper.get("arxiv_id"),
+                                    title=paper.get("title"),
+                                    authors=paper.get("authors"),
+                                    abstract=paper.get("abstract"),
+                                    published=paper.get("published"),
+                                    category=paper.get("category"),
+                                    url=paper.get("url"),
+                                    pdf_url=paper.get("pdf_url"),
+                                    fetched_at=datetime.now())
+        await new_paper.insert()
+        return new_paper

@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from .routes import users
+from .routes import users, papers
 from .middleware import setup_middleware
 from .db import init as init_db
 from requests.exceptions import RequestException
@@ -8,6 +8,7 @@ app = FastAPI(title="Execution Agent API")
 
 setup_middleware(app)
 app.include_router(users.router)
+app.include_router(papers.router)
 
 @app.on_event("startup")
 async def on_startup():
@@ -16,4 +17,4 @@ async def on_startup():
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to Execution Agent API!"}
+    return {"message": "Welcome to Fetch Service API!"}
