@@ -4,6 +4,7 @@ from typing import Dict
 from datetime import datetime
 
 class Paper(BaseModel):
+    collection_id: str
     user_id: str
     arxiv_id: str
     title: str

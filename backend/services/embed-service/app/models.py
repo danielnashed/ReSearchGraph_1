@@ -3,6 +3,22 @@ from beanie import Document
 from typing import Dict
 from datetime import datetime
 
+class Paper(BaseModel):
+    user_id: str
+    arxiv_id: str
+    title: str
+    authors: list
+    abstract: str
+    published: datetime
+    category: str
+    url: str
+    pdf_url: str
+    fetched_at: datetime = None
+
+class PaperDocument(Paper, Document):
+    pass
+    class Settings:
+        name = "papers"  # MongoDB collection name
 
 class User(BaseModel):
     auto_increment_id: int

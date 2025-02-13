@@ -2,9 +2,10 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
 import arxiv
 import datetime
+import uuid
 from pydantic import BaseModel
-# from ..crud import UserCRUD as CRUD
 from ..crud import paperCRUD as CRUD
+from ..aws.sqs_client import SQSClient
 
 router = APIRouter(prefix="/fetch-papers", tags=["Papers"])
 
@@ -14,6 +15,9 @@ class paperRequest(BaseModel):
 # Fetch papers from external source
 @router.post("/")
 async def create_papers_route(request: paperRequest):
+
+    # ID unique to each batch of papers fetched together
+    collection_id = str(uuid.uuid4())[:8]
 
     # Get current date and time in GMT
     now = datetime.datetime.now(datetime.timezone.utc)
@@ -43,6 +47,7 @@ async def create_papers_route(request: paperRequest):
     for result in search.results():
         print(result)
         papers.append({
+            "collection_id": collection_id,
             "user_id": request.user_id,
             "arxiv_id": result.get_short_id(),
             "title": result.title,
@@ -57,6 +62,19 @@ async def create_papers_route(request: paperRequest):
     # Create a new paper in the database
     for paper in papers:
         await CRUD.create_paper(paper)
+
+    # Create queue message 
+    message = {
+        "collection_id": collection_id,
+        "user_id": request.user_id,
+        "papers_count": len(papers),
+        "timestamp": now.isoformat()
+    }
+
+    # Inject message to queue
+    sqs_client = SQSClient()
+    await sqs_client.send_message(message)
+
     
     return JSONResponse(content={"papers": papers}, 
                         status_code=201)
