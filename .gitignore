@@ -1,4 +1,5 @@
 backend/.env
 backend/.venv
+backend/nohup.out
 frontend/node_modules
 .DS_Store

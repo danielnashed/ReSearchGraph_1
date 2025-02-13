@@ -1,7 +1,7 @@
 from fastapi import FastAPI
-from app.routes import users
-from app.middleware import setup_middleware
-from app.db import init as init_db
+from .routes import users
+from .middleware import setup_middleware
+from .db import init as init_db
 from requests.exceptions import RequestException
 
 app = FastAPI(title="Execution Agent API")
