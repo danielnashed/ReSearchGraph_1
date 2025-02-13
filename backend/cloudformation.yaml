@@ -33,11 +33,11 @@ Resources:
           python3 -m venv venv
           source venv/bin/activate
           pip install -r requirements.txt
-          nohup uvicorn services.fetch-service.main:app --host 0.0.0.0 --port 8000 &
-          nohup uvicorn services.embed-service.main:app --host 0.0.0.0 --port 8001 &
-          nohup uvicorn services.cluster-service.main:app --host 0.0.0.0 --port 8002 &
-          nohup uvicorn services.graph-service.main:app --host 0.0.0.0 --port 8003 &
-          nohup uvicorn services.visualize-service.main:app --host 0.0.0.0 --port 8004 &
+          nohup uvicorn services.fetch-service.app.main:app --host 0.0.0.0 --port 8000 &
+          nohup uvicorn services.embed-service.app.main:app --host 0.0.0.0 --port 8001 &
+          nohup uvicorn services.cluster-service.app.main:app --host 0.0.0.0 --port 8002 &
+          nohup uvicorn services.graph-service.app.main:app --host 0.0.0.0 --port 8003 &
+          nohup uvicorn services.visualize-service.app.main:app --host 0.0.0.0 --port 8004 &
 
   # Security group to allow HTTP and SSH traffic
   BackendSecurityGroup:
