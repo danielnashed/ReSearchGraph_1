@@ -12,6 +12,7 @@ app.include_router(users.router)
 @app.on_event("startup")
 async def on_startup():
     await init_db()  # Initialize the database and Beanie
+    print("Database connected")
 
 @app.get("/")
 def read_root():

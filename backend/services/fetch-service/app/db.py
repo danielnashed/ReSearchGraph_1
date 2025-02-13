@@ -12,6 +12,7 @@ load_dotenv(dotenv_path)
 
 # MongoDB Atlas connection URI from environment variable
 connection_string = os.getenv("MONGODB_URI")
+print('MONGODB_URI: ', connection_string)
 
 # MongoDB connection URI
 client = motor.motor_asyncio.AsyncIOMotorClient(connection_string)
