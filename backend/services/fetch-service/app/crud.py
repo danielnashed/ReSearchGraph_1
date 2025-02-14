@@ -40,6 +40,7 @@ class paperCRUD():
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         new_paper = PaperDocument(user_id=user_id,
+                                    collection_id=paper.get("collection_id"),
                                     arxiv_id=paper.get("arxiv_id"),
                                     title=paper.get("title"),
                                     authors=paper.get("authors"),
@@ -48,6 +49,7 @@ class paperCRUD():
                                     category=paper.get("category"),
                                     url=paper.get("url"),
                                     pdf_url=paper.get("pdf_url"),
+                                    summary_embedding=[],
                                     fetched_at=datetime.now())
         await new_paper.insert()
         return new_paper

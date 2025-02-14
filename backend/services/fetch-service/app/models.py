@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from beanie import Document
-from typing import Dict
+from typing import Dict, List
 from datetime import datetime
 
 class Paper(BaseModel):
@@ -14,6 +14,7 @@ class Paper(BaseModel):
     category: str
     url: str
     pdf_url: str
+    summary_embedding: List
     fetched_at: datetime = None
 
 class PaperDocument(Paper, Document):

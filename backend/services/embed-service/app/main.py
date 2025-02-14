@@ -17,10 +17,13 @@ setup_middleware(app)
 app.include_router(users.router)
 
 # Initialize the SQS client for input and output queues
-embed_queue_url = os.getenv('AWS_SQS_EMBED_URL')
-embed_sqs_client = SQSClient(embed_queue_url, process_message=create_embeddings)
 cluster_queue_url = os.getenv('AWS_SQS_CLUSTER_URL')
-cluster_sqs_client = SQSClient(cluster_queue_url, process_message=None)
+cluster_sqs_client = SQSClient(cluster_queue_url)
+embed_queue_url = os.getenv('AWS_SQS_EMBED_URL')
+embed_sqs_client = SQSClient(embed_queue_url, 
+                             process_message=create_embeddings, 
+                             consumer=cluster_sqs_client
+                             )
 
 @app.on_event("startup")
 async def on_startup():

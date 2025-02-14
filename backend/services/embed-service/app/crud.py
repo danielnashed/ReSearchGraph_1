@@ -49,6 +49,7 @@ class paperCRUD():
                                     category=paper.get("category"),
                                     url=paper.get("url"),
                                     pdf_url=paper.get("pdf_url"),
+                                    summary_embedding=None,
                                     fetched_at=datetime.now())
         await new_paper.insert()
         return new_paper
@@ -57,3 +58,8 @@ class paperCRUD():
     @staticmethod
     async def get_papers(user_id: str, collection_id: str) -> List[PaperDocument]:
         return await PaperDocument.find({"user_id": user_id, "collection_id": collection_id}).to_list()
+    
+    # # Get paper by internal id
+    # @staticmethod
+    # async def get_paper(id: ObjectId) -> List[PaperDocument]:
+    #     return await PaperDocument.find({"_id": id})
