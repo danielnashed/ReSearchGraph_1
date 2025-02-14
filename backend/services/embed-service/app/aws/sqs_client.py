@@ -25,7 +25,6 @@ class SQSClient:
             QueueUrl=self.url,
             MessageBody=str(message)
         )
-        print(f"Message sent to {self.url}")
 
     # async def poll_sqs(self):
     #     stop_polling = False
@@ -38,6 +37,7 @@ class SQSClient:
             asyncio.sleep(5)
 
     async def _receive_message(self) -> Optional[dict]:
+        print(f"Polling {self.url}")
         response = self.client.receive_message(
             QueueUrl=self.url,
             MaxNumberOfMessages=1,
@@ -46,11 +46,13 @@ class SQSClient:
         messages = response.get('Messages', [])
         if not messages:
             return False
+        print(f"Received {len(messages)} messages from {self.url}")
         for message in messages:
             # Process the message
             await self.process_message(message)
             receipt_handle = message['ReceiptHandle']
             self._delete_message(receipt_handle)
+        print(f"Finished processing all messages at {self.url}")
         return True
     
     def _delete_message(self, receipt_handle: str):

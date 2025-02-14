@@ -51,3 +51,8 @@ class paperCRUD():
                                     fetched_at=datetime.now())
         await new_paper.insert()
         return new_paper
+    
+    # Get papers by user ID and collection ID
+    @staticmethod
+    async def get_papers(user_id: str, collection_id: str) -> List[PaperDocument]:
+        return await PaperDocument.find({"user_id": user_id, "collection_id": collection_id}).to_list()

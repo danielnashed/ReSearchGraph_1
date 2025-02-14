@@ -3,11 +3,15 @@ from fastapi.responses import JSONResponse
 import arxiv
 import datetime
 import uuid
+import os
 from pydantic import BaseModel
 from ..crud import paperCRUD as CRUD
 from ..aws.sqs_client import SQSClient
+from dotenv import load_dotenv
 
 router = APIRouter(prefix="/fetch-papers", tags=["Papers"])
+
+load_dotenv()
 
 class paperRequest(BaseModel):
     user_id: str
@@ -37,12 +41,14 @@ async def create_papers_route(request: paperRequest):
     query += f" AND submittedDate:{date_range}"
     print("Query:", query)
 
+    # Search for papers
     search = arxiv.Search(
-        query=query,
+        query='Generative AI',
         max_results=10,
         sort_by=arxiv.SortCriterion.SubmittedDate
     )
 
+    # Extract papers from search results
     papers = []
     for result in search.results():
         print(result)
@@ -59,7 +65,7 @@ async def create_papers_route(request: paperRequest):
             "pdf_url": result.pdf_url
         })
     
-    # Create a new paper in the database
+    # Create new papers in the database
     for paper in papers:
         await CRUD.create_paper(paper)
 
@@ -72,9 +78,9 @@ async def create_papers_route(request: paperRequest):
     }
 
     # Inject message to queue
-    sqs_client = SQSClient()
-    await sqs_client.send_message(message)
+    queue_url = os.getenv('AWS_SQS_EMBED_URL')
+    sqs_client = SQSClient(queue_url, process_message=None)
+    sqs_client.send_message(message)
 
-    
     return JSONResponse(content={"papers": papers}, 
                         status_code=201)
