@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from beanie import Document
 from typing import Dict, List
 from datetime import datetime
+from incdbscan import IncrementalDBSCAN
 
 class Paper(BaseModel):
     collection_id: str
@@ -24,10 +25,13 @@ class PaperDocument(Paper, Document):
 
 class User(BaseModel):
     auto_increment_id: int
+    clusterer: bytes
     created_at: datetime = None  # Automatically set when a user is created
 
+    class Config:
+        arbitrary_types_allowed = True
+
 class UserDocument(User, Document):
-    auto_increment_id: int
-    created_at: datetime
+    pass
     class Settings:
         name = "users"  # MongoDB collection name

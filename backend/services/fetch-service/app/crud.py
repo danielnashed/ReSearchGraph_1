@@ -3,14 +3,20 @@ from typing import Optional, List
 from .models import UserDocument, PaperDocument
 from fastapi import HTTPException
 from bson import ObjectId
+import pickle
 from .db import get_next_sequence_value
+from incdbscan import IncrementalDBSCAN
 
 class UserCRUD():
     # Create a new user
     @staticmethod
     async def create_user() -> UserDocument:
         auto_increment_id = await get_next_sequence_value("user_id")
+        clusterer = IncrementalDBSCAN(eps=0.5, min_pts=5)
+        # Serialize the clusterer object
+        serialized_clusterer = pickle.dumps(clusterer)
         new_user = UserDocument(auto_increment_id=auto_increment_id,
+                                clusterer=serialized_clusterer,
                                 created_at=datetime.now())
         await new_user.insert()
         return new_user
@@ -18,7 +24,11 @@ class UserCRUD():
     # Get a user by ID
     @staticmethod
     async def get_user_by_id(user_id: str) -> Optional[UserDocument]:
-        return await UserDocument.find_one({"_id": ObjectId(user_id)})
+        user = await UserDocument.find_one({"_id": ObjectId(user_id)})
+        if user:
+            # Deserialize the clusterer object
+            user.clusterer = pickle.loads(user.clusterer)
+        return user
     
     # Delete a user by ID
     @staticmethod

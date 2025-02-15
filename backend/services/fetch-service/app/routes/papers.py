@@ -44,7 +44,7 @@ async def create_papers_route(request: paperRequest):
     # Search for papers
     search = arxiv.Search(
         query='Generative AI',
-        max_results=10,
+        max_results=90,
         sort_by=arxiv.SortCriterion.SubmittedDate
     )
 
