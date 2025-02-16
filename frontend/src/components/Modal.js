@@ -1,7 +1,22 @@
 export default function Modal({ title, summary, papers, backgroundColor, onClose }) {
+
+    // Function to convert hex to RGBA
+    const hexToRgba = (hex, alpha = 0.95) => {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    };
+
+    const translucentBackgroundColor = hexToRgba(backgroundColor);
+
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white rounded-lg p-8 w-3/4 max-w-3xl">
+        <div 
+            // className="fixed inset-0 flex flex-col items-center justify-center z-50"
+            className="fixed inset-0 flex flex-col items-center justify-center z-50"
+            style={{ backgroundColor: translucentBackgroundColor
+             }}
+        >
                 <button onClick={onClose} className="absolute top-4 right-4 text-black">
                     &times;
                 </button>
@@ -16,7 +31,6 @@ export default function Modal({ title, summary, papers, backgroundColor, onClose
                         </li>
                     ))}
                 </ul>
-            </div>
         </div>
     );
 }

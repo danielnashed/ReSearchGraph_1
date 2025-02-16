@@ -24,7 +24,7 @@ export default function Cluster({ title, papers_count, summary, papers }) {
     return (
         <>
             <div
-                className="flex items-center justify-center text-white rounded-full shadow-xl shadow-zinc-500 m-4 transition-transform transform hover:scale-105 hover:shadow-2xl hover:shadow-zinc-600"
+                className="flex items-center justify-center text-white rounded-full shadow-xl shadow-zinc-500 m-4 transition-transform transform hover:scale-105 hover:shadow-2xl hover:shadow-zinc-600 cursor-pointer z-10"
                 style={{
                     width: `${radius}px`,
                     height: `${radius}px`,

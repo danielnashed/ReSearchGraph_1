@@ -1,43 +1,56 @@
 // import Modal from './Modal';
 import axios from 'axios';
 import { API_ENDPOINTS } from "../Endpoints.js";
+import { useState, useEffect } from 'react';
 
-export default function NavBar({ onMenuClick, setConvId, setMessages, convId, messages }) {
+export default function NavBar() {
 
-    const handleViewMemory = () => {
-        document.getElementById('my_modal_3').showModal();
+    const [isRetrieverActive, setIsRetrieverActive] = useState(false);
+
+    const handleRetrieverClick = () => {
+        setIsRetrieverActive(!isRetrieverActive);
+        handleRetriever();
     };
 
-    const handleNewChat = async () => {
+
+    const handleRetriever = () => {
+    };
+
+    const handleLogOut = () => {
+        localStorage.clear();
+        window.location.href = '/';
+    };
+
+    // const handleNewChat = async () => {
         
-        const userId = localStorage.getItem('userId');
+    //     const userId = localStorage.getItem('userId');
 
-        // Save current chat before creating new one
-        const History = {
-            convId,
-            messages,
-            timestamp: new Date().toISOString()
-        };
-        localStorage.setItem('chatHistory', JSON.stringify(History));
+    //     // Save current chat before creating new one
+    //     const History = {
+    //         convId,
+    //         messages,
+    //         timestamp: new Date().toISOString()
+    //     };
+    //     localStorage.setItem('chatHistory', JSON.stringify(History));
 
-        // Create new conversation
-        const convResponse = await axios.post(
-            API_ENDPOINTS.POST_CREATE_CONV,
-            { user_id: userId }
-            );
-        if (convResponse.status !== 201) {
-        console.error("Failed to create conversation");
-        return;
-        }
-        const newConvId = convResponse.data.conv_id;
-        setConvId(newConvId); // Update parent state
-        setMessages([]); // Clear messages
-    }
+    //     // Create new conversation
+    //     const convResponse = await axios.post(
+    //         API_ENDPOINTS.POST_CREATE_CONV,
+    //         { user_id: userId }
+    //         );
+    //     if (convResponse.status !== 201) {
+    //     console.error("Failed to create conversation");
+    //     return;
+    //     }
+    //     const newConvId = convResponse.data.conv_id;
+    //     setConvId(newConvId); // Update parent state
+    //     setMessages([]); // Clear messages
+    // }
 
     return (
-        <div className="navbar bg-base-100 bg-zinc-800/0 fixed top-0 w-full z-50">
-            <div className="flex-1">
-                <button onClick={onMenuClick} className="btn btn-square btn-ghost">
+        <div className="navbar bg-base-100 bg-zinc-800/0 absolute top-0 w-full z-50">
+            <div className="flex-none">
+                <button onClick={handleRetrieverClick} className="btn btn-square btn-ghost">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block h-5 w-5 stroke-current">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
@@ -62,11 +75,15 @@ export default function NavBar({ onMenuClick, setConvId, setMessages, convId, me
                             </path>
                         </svg>
                     </button>
-                    <ul tabIndex={0} className="dropdown-content menu bg-zinc-900/70 rounded-box z-[1] w-52 p-2 shadow-zinc-800 shadow-lg bg-blend-darken">
-                        <li><a onClick={handleNewChat}>New Chat</a></li>
-                        <li><a onClick={handleViewMemory}>Memory</a></li>
+                    <ul tabIndex={0} className="dropdown-content menu bg-neutral-400/100 rounded-box z-30 w-52 p-2 shadow-zinc-800 shadow-lg">
+                        <li>
+                            <a onClick={handleRetrieverClick}
+                                className={`px-4 py-2 rounded ${isRetrieverActive ? 'bg-red-500 text-white' : 'bg-emerald-500 text-white'}`}>
+                                {isRetrieverActive ? 'Stop Retriever' : 'Start Retriever'}
+                            </a>
+                        </li>
+                        <li><a onClick={handleLogOut}>Logout</a></li>
                     </ul>
-                    {/* <Modal /> */}
                 </div>
             </div>
         </div>

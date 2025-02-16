@@ -1,16 +1,16 @@
 "use client";
 
 import Head from "next/head";
-// import TextInput from "../components/TextInput";
-import NavBar from "../components/NavBar";
-// import Drawer from "../components/Drawer";
-// import ChatBox from '../components/ChatBox';
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import NavBar from "../components/NavBar";
 import Cluster from '../components/Cluster';
+import Auth from "../components/Auth";
 import { API_ENDPOINTS } from "../Endpoints.js";
 
 const Page = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [clusters, setClusters] = useState([]);
   const [userId, setUserId] = useState(null);
   const [convId, setConvId] = useState(null);
   const [inputValue, setInputValue] = useState("");
@@ -24,6 +24,19 @@ const Page = () => {
     { title: 'Paper 2', url: 'https://example.com/paper2' },
     // Add more papers as needed
 ];
+  
+  const handleAuthSuccess = (userId) => {
+    setIsAuthenticated(true);
+    setUserId(userId);
+  };
+
+  const handleClustersReceived = (clustersData) => {
+    setClusters(clustersData);
+  };
+
+  if (!isAuthenticated) {
+    return <Auth onAuthSuccess={handleAuthSuccess} onClustersReceived={handleClustersReceived}/>;
+  }
 
 //   // upon initial mount (first time only), create user and conversation
 //   useEffect(() => {
@@ -107,12 +120,7 @@ const Page = () => {
     <div 
       className="relative min-h-screen before:content-[''] before:absolute before:inset-0 before:bg-black/10"
       >
-        {/* <NavBar 
-          onMenuClick={handleDrawerToggle}
-          setConvId={setConvId}
-          setMessages={setMessages}
-          convId={convId}
-          messages={messages} /> */}
+        <NavBar/>
         <div className="p-4">
           <Head>
             <title>Next.js + Tailwind CSS</title>
@@ -122,7 +130,16 @@ const Page = () => {
           </Head>
           <main className="text-center pt-16">
             {/* <div className="w-[100%] mx-auto h-[calc(100vh-300px)] mb-4 rounded-lg border border-zinc-400/30 bg-zinc-800/10 shadow-2xl shadow-zinc-950/90 backdrop-blur-sm"> */}
-            <div className="w-[100%] mx-auto h-[calc(100vh-100px)] mb-4 rounded-lg border border-zinc-400/30 bg-zinc-800/10 shadow-2xl shadow-zinc-950/90 backdrop-blur-sm flex flex-wrap gap-4 p-4 overflow-auto">
+            <div className="w-[100%] mx-auto h-max mb-4 rounded-lg border border-zinc-400/30 bg-zinc-800/10 shadow-2xl shadow-zinc-950/90 backdrop-blur-sm flex flex-wrap gap-4 p-4 overflow-auto">
+              {clusters.map((cluster, index) => (
+                <Cluster
+                  key={index}
+                  title={cluster.title}
+                  papers_count={cluster.papers_count}
+                  summary={cluster.summary}
+                  papers={cluster.papers}
+                />
+              ))}
                 <Cluster title="Cluster 1" papers_count={10} summary="text" papers={papersExample}/>
                 <Cluster title="Cluster 2" papers_count={200} summary="text" papers={papersExample}/>
                 <Cluster title="Cluster 1" papers_count={100} summary="text" papers={papersExample}/>
@@ -143,10 +160,6 @@ const Page = () => {
                 <Cluster title="Cluster 1" papers_count={60} summary="text" papers={papersExample}/>
                 <Cluster title="Cluster 2" papers_count={100} summary="text" papers={papersExample}/>
             </div>
-            {/* <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 p-4 w-[60%] mb-4">
-              <div className="relative flex items-center w-full">
-              </div>
-            </div> */}
           </main>
         </div>
       </div>
