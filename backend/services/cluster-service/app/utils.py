@@ -2,7 +2,6 @@ from .crud import UserCRUD
 from .crud import paperCRUD
 from .crud import clusterCRUD
 from .aws.bedrock_client import BedrockClient
-from incdbscan import IncrementalDBSCAN
 import json
 import pickle
 

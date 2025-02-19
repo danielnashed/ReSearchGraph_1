@@ -19,8 +19,8 @@ export default function Modal({ title, summary, papers, backgroundColor, onClose
                 <button onClick={onClose} className="absolute top-4 right-4 text-black">
                     &times;
                 </button>
-                <div className = "overflow-auto">
-                    <h2 className="text-2xl font-semibold mb-4 p-4">{title}</h2>
+                <div className="overflow-auto p-8">
+                    <h2 className="text-2xl font-semibold mb-4">{title}</h2>
                     <p className="mb-4">{summary}</p>
                     <ul className="list-disc pl-5">
                         {papers.map((paper, index) => (

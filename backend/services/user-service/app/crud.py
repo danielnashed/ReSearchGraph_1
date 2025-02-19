@@ -12,7 +12,7 @@ class UserCRUD():
     @staticmethod
     async def create_user(email: str, password: str) -> UserDocument:
         auto_increment_id = await get_next_sequence_value("user_id")
-        clusterer = IncrementalDBSCAN(eps=0.5, min_pts=5)
+        clusterer = IncrementalDBSCAN(eps=1.0, min_pts=2)
         # Serialize the clusterer object
         serialized_clusterer = pickle.dumps(clusterer)
         new_user = UserDocument(auto_increment_id=auto_increment_id,
