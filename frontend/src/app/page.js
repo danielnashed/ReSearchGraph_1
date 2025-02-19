@@ -120,7 +120,7 @@ const Page = () => {
     <div 
       className="relative min-h-screen before:content-[''] before:absolute before:inset-0 before:bg-black/10"
       >
-        <NavBar/>
+        <NavBar onClustersReceived={handleClustersReceived} />
         <div className="p-4">
           <Head>
             <title>Next.js + Tailwind CSS</title>

@@ -12,7 +12,6 @@ export default function Modal({ title, summary, papers, backgroundColor, onClose
 
     return (
         <div 
-            // className="fixed inset-0 flex flex-col items-center justify-center z-50"
             className="fixed inset-0 flex flex-col items-center justify-center z-50"
             style={{ backgroundColor: translucentBackgroundColor
              }}
@@ -20,17 +19,19 @@ export default function Modal({ title, summary, papers, backgroundColor, onClose
                 <button onClick={onClose} className="absolute top-4 right-4 text-black">
                     &times;
                 </button>
-                <h2 className="text-2xl font-semibold mb-4">{title}</h2>
-                <p className="mb-4">{summary}</p>
-                <ul className="list-disc pl-5">
-                    {papers.map((paper, index) => (
-                        <li key={index}>
-                            <a href={paper.url} target="_blank" rel="noopener noreferrer" className="text-blue-500">
-                                {paper.title}
-                            </a>
-                        </li>
-                    ))}
-                </ul>
+                <div className = "overflow-auto">
+                    <h2 className="text-2xl font-semibold mb-4 p-4">{title}</h2>
+                    <p className="mb-4">{summary}</p>
+                    <ul className="list-disc pl-5">
+                        {papers.map((paper, index) => (
+                            <li key={index}>
+                                <a href={paper.url} target="_blank" rel="noopener noreferrer" className="text-blue-900">
+                                    {paper.title}
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
         </div>
     );
 }

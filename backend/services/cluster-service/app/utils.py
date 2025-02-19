@@ -59,7 +59,7 @@ async def create_clusters(message):
             "label": cluster_label,
             "summary": cluster_summary,
             "summary_embedding": cluster_summary_embedding,
-            "papers": [(str(paper.id), paper.pdf_url) for paper in papers_in_cluster]
+            "papers": [{"id": str(paper.id), "title": paper.title, "url": paper.pdf_url} for paper in papers_in_cluster]
         }
         if cluster_id in existing_cluster_ids:
             await clusterCRUD.update_cluster(cluster_dict)

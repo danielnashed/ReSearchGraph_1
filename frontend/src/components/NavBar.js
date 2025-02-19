@@ -3,7 +3,7 @@ import axios from 'axios';
 import { API_ENDPOINTS } from "../Endpoints.js";
 import { useState, useEffect } from 'react';
 
-export default function NavBar() {
+export default function NavBar({onClustersReceived}) {
 
     const [isRetrieverActive, setIsRetrieverActive] = useState(false);
 
@@ -29,42 +29,27 @@ export default function NavBar() {
         window.location.href = '/';
     };
 
-    const handleGhost = () => {
-    };
-
-    // const handleNewChat = async () => {
-        
-    //     const userId = localStorage.getItem('userId');
-
-    //     // Save current chat before creating new one
-    //     const History = {
-    //         convId,
-    //         messages,
-    //         timestamp: new Date().toISOString()
-    //     };
-    //     localStorage.setItem('chatHistory', JSON.stringify(History));
-
-    //     // Create new conversation
-    //     const convResponse = await axios.post(
-    //         API_ENDPOINTS.POST_CREATE_CONV,
-    //         { user_id: userId }
-    //         );
-    //     if (convResponse.status !== 201) {
-    //     console.error("Failed to create conversation");
-    //     return;
-    //     }
-    //     const newConvId = convResponse.data.conv_id;
-    //     setConvId(newConvId); // Update parent state
-    //     setMessages([]); // Clear messages
-    // }
+    const updateDashboard = async () => {
+        try {
+            const userId = localStorage.getItem('userId');
+            const url = API_ENDPOINTS.GET_CLUSTERS.replace(':userId', userId);
+            const response = await axios.get(`${url}`);
+            if (response.status === 200) {
+                const clusters = response.data.clusters;
+                onClustersReceived(clusters);
+            } else {
+                console.error('Failed to update dashboard');
+            }
+        } catch (error) {
+            console.error('Error updating dashboard:', error);
+        }
+      };
 
     return (
         <div className="navbar bg-base-100 bg-zinc-800/0 absolute top-0 w-full z-50">
             <div className="flex-none">
-                <button onClick={handleGhost} className="btn btn-square btn-ghost">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block h-5 w-5 stroke-current">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
+                <button onClick={updateDashboard} className="btn btn-square btn-ghost">
+                    <img src="/refresh.png" alt="Update Dashboard" className="inline-block h-5 w-5" />
                 </button>
             </div>
             <div className="flex-1">

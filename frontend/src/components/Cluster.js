@@ -6,7 +6,7 @@ export default function Cluster({ title, papers_count, summary, papers }) {
     const [randomColor, setRandomColor] = useState('#000000');
 
     // Calculate the radius based on the paper count
-    const radius = 100 + papers_count * 0.5; // Example calculation
+    const radius = 100 + papers_count * 0.5;
 
     useEffect(() => {
         // Generate a random color on the client side
