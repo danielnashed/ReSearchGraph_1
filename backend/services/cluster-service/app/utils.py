@@ -57,8 +57,8 @@ async def create_clusters(message):
             "cluster_id": cluster_id,
             "user_id": user_id,
             "label": cluster_label,
-            "summary": [cluster_summary],
-            "summary_embedding": [cluster_summary_embedding],
+            "summary": cluster_summary,
+            "summary_embedding": cluster_summary_embedding,
             "papers": [(str(paper.id), paper.pdf_url) for paper in papers_in_cluster]
         }
         if cluster_id in existing_cluster_ids:

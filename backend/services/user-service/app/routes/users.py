@@ -50,11 +50,7 @@ async def delete_user_route(user_id: str):
         raise HTTPException(status_code=404, detail="User not found")
     # Delete eventbridge rule and target for user
     rule_name = f"FetchPapersScheduledRule_{user_id}"
-    target_name = f"FetchPapersScheduledTarget_{user_id}"
-    target = {"Id": target_name,
-                "Arn": AWS_TARGET_ARN,
-                "RoleArn": AWS_TARGET_ROLE_ARN,
-                }
+    target = create_target_for_user(user_id)
     eventbridge_client = EventBridgeClient(rule=rule_name, target=target)
     eventbridge_client.delete_rule()  
     return JSONResponse(content=result, 

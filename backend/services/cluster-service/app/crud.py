@@ -108,13 +108,15 @@ class clusterCRUD():
         user = await UserCRUD.get_user_by_id(ObjectId(user_id))
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
-        cluster = await clusterCRUD.get_cluster(user_id, cluster_id)
-        cluster.summary.append(cluster.get("summary"))
-        cluster.summary_embedding.append(cluster.get("summary_embedding"))
-        cluster.papers.append(cluster.get("papers"))
-        cluster.updated_at = datetime.now()
-        await cluster.save()
-        return cluster
+        existing_cluster = await clusterCRUD.get_cluster(user_id, cluster_id)
+        if not existing_cluster:
+            raise HTTPException(status_code=404, detail="Cluster not found")
+        existing_cluster.summary.append(cluster.get("summary"))
+        existing_cluster.summary_embedding.append(cluster.get("summary_embedding"))
+        existing_cluster.papers.extend(cluster.get("papers"))
+        existing_cluster.updated_at = datetime.now()
+        await existing_cluster.save()
+        return existing_cluster
     
     # Get all clusters by user ID
     @staticmethod
