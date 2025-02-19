@@ -17,7 +17,7 @@ class paperRequest(BaseModel):
     user_id: str
 
 # Fetch papers from external source
-@router.post("/")
+@router.post("")
 async def create_papers_route(request: paperRequest):
 
     # ID unique to each batch of papers fetched together

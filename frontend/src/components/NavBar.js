@@ -8,17 +8,28 @@ export default function NavBar() {
     const [isRetrieverActive, setIsRetrieverActive] = useState(false);
 
     const handleRetrieverClick = () => {
-        setIsRetrieverActive(!isRetrieverActive);
         handleRetriever();
+        setIsRetrieverActive(!isRetrieverActive);
     };
 
 
-    const handleRetriever = () => {
+    const handleRetriever = async () => {
+        const userId = localStorage.getItem('userId');
+        const url = API_ENDPOINTS.POST_SCHEDULER.replace(':userId', userId);
+        // Start or stop retriever
+        const response = await axios.post(`${url}`, { scheduler_on: !isRetrieverActive });
+        if (response.status !== 200) {
+            console.error("Failed to change status of scheduler");
+            return;
+        }
     };
 
     const handleLogOut = () => {
         localStorage.clear();
         window.location.href = '/';
+    };
+
+    const handleGhost = () => {
     };
 
     // const handleNewChat = async () => {
@@ -50,7 +61,7 @@ export default function NavBar() {
     return (
         <div className="navbar bg-base-100 bg-zinc-800/0 absolute top-0 w-full z-50">
             <div className="flex-none">
-                <button onClick={handleRetrieverClick} className="btn btn-square btn-ghost">
+                <button onClick={handleGhost} className="btn btn-square btn-ghost">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block h-5 w-5 stroke-current">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>

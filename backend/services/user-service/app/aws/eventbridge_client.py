@@ -39,3 +39,7 @@ class EventBridgeClient:
 
     def disable_rule(self):
         self.client.disable_rule(Name=self.rule)
+
+    def delete_rule(self):
+        self.client.remove_targets(Rule=self.rule, Ids=[self.target])
+        self.client.delete_rule(Name=self.rule)

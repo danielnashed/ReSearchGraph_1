@@ -5,14 +5,7 @@ from fastapi import HTTPException
 from bson import ObjectId
 from .db import get_next_sequence_value
 from incdbscan import IncrementalDBSCAN
-from .aws.eventbridge_client import EventBridgeClient
-from dotenv import load_dotenv
 import pickle
-import os
-
-load_dotenv()
-AWS_TARGET_ARN = os.getenv("AWS_TARGET_ARN")
-AWS_TARGET_ROLE_ARN= os.getenv("AWS_TARGET_ROLE_ARN")
 
 class UserCRUD():
     # Create a new user
@@ -27,17 +20,7 @@ class UserCRUD():
                                 password=password,
                                 clusterer=serialized_clusterer,
                                 created_at=datetime.now())
-        await new_user.insert()
-        # Create an eventbridge rule and target for user
-        user = await UserCRUD.get_user_by_email_password(email, password) 
-        rule_name = f"FetchPapersScheduledRule_{str(user.id)}"
-        target_name = f"FetchPapersScheduledTarget_{str(user.id)}"
-        target = {"Id": target_name,
-                    "Arn": AWS_TARGET_ARN,
-                    "RoleArn": AWS_TARGET_ROLE_ARN,
-                  }
-        eventbridge_client = EventBridgeClient(rule=rule_name, target=target)
-        eventbridge_client.create_rule(schedule="cron(0 9 * * ? *)")                                     
+        await new_user.insert()                                   
         return new_user
     
     # Get a user by ID
