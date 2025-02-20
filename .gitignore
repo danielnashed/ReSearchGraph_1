@@ -1,7 +1,9 @@
 backend/.env
 backend/.venv
 backend/nohup.out
+backend/test.py
 frontend/node_modules
+frontend/.next
 .DS_Store
 __pycache__/
 *.pyc
