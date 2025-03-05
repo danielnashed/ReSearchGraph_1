@@ -11,7 +11,7 @@ import os
 
 load_dotenv()
 
-app = FastAPI(title="Execution Agent API")
+app = FastAPI(title="Embed Service API")
 
 setup_middleware(app)
 app.include_router(users.router)

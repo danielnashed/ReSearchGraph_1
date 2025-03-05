@@ -4,7 +4,7 @@ from .middleware import setup_middleware
 from .db import init as init_db
 from requests.exceptions import RequestException
 
-app = FastAPI(title="Execution Agent API")
+app = FastAPI(title="Fetch Service API")
 
 setup_middleware(app)
 app.include_router(users.router)
