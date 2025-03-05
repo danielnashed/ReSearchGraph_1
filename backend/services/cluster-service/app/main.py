@@ -9,6 +9,8 @@ from dotenv import load_dotenv
 import asyncio
 import os
 
+# insert comment to test CI/CD pipeline
+
 load_dotenv()
 
 app = FastAPI(title="Cluster Service API")
