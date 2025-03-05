@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 import asyncio
 import os
 
-# insert comment to test CI/CD pipelinee
+# insert comment to test CI/CD pipelineeee
 
 load_dotenv()
 
