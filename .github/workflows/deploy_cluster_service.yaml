@@ -34,6 +34,7 @@ on:
 
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}                            # set this to your preferred AWS region, e.g. us-west-1
+  DOCKER_FILE_PATH: backend/services/cluster-service/Dockerfile    # filepath to dockerfile
   ECR_REPOSITORY: research-graph/cluster-service                   # set this to your Amazon ECR repository name
   ECS_CLUSTER: ResearchGraph-ECS-Cluster2                          # set this to your Amazon ECS cluster name
   ECS_SERVICE: ResearchGraph-ECS-Service2                          # set this to your Amazon ECS service name
@@ -70,10 +71,8 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        # Build a docker container and
-        # push it to ECR so that it can
-        # be deployed to ECS.
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        # Build a docker container and push it to ECR so that it can be deployed to ECS.
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f ${{ env.DOCKER_FILE_PATH }} .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
