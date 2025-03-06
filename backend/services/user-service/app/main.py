@@ -4,7 +4,7 @@ from .middleware import setup_middleware
 from .db import init as init_db
 from requests.exceptions import RequestException
 
-# insert comment to test CI/CD pipelineeee
+# insert comment to test CI/CD pipelinee
 
 app = FastAPI(title="User Service API")
 
