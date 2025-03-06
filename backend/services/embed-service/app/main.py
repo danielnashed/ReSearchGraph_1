@@ -9,6 +9,8 @@ from dotenv import load_dotenv
 import asyncio
 import os
 
+# Comment to test ci/cd pipeline
+
 load_dotenv()
 
 app = FastAPI(title="Embed Service API")
