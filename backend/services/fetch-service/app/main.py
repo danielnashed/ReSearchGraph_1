@@ -4,6 +4,8 @@ from .middleware import setup_middleware
 from .db import init as init_db
 from requests.exceptions import RequestException
 
+# Comment to test ci/cd pipeline
+
 app = FastAPI(title="Fetch Service API")
 
 setup_middleware(app)
