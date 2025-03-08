@@ -1,6 +1,7 @@
-const API_BASE_URL = 'http://127.0.0.1:8003/';
+// const API_BASE_URL = 'http://127.0.0.1:8003/';
 // const API_BASE_URL = 'http://52.70.122.43:8003/';
 // const API_BASE_URL =  'https://65wc0j31f7.execute-api.us-east-1.amazonaws.com/prod/';
+const API_BASE_URL = 'https://yaq1t4w8oj.execute-api.us-east-1.amazonaws.com/prod/';
 
 export const API_ENDPOINTS = {
     POST_LOGIN: API_BASE_URL + 'users/login/',
