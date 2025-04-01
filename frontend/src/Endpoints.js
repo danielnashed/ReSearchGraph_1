@@ -3,7 +3,7 @@
 // const API_BASE_URL =  'https://65wc0j31f7.execute-api.us-east-1.amazonaws.com/prod/';
 // const API_BASE_URL = 'https://yaq1t4w8oj.execute-api.us-east-1.amazonaws.com/';
 // const API_BASE_URL = 'https://2rjo6qgqsf.execute-api.us-east-1.amazonaws.com/';
-const API_BASE_URL = 'https://29zqbbn5xh.execute-api.us-east-1.amazonaws.com/';
+const API_BASE_URL = 'https://29zqbbn5xh.execute-api.us-east-1.amazonaws.com/prod/';
 
 export const API_ENDPOINTS = {
     POST_LOGIN: API_BASE_URL + 'users/login/',
