@@ -1,6 +1,8 @@
-# Research Graph Project
+# AI Research Trends Dashboard
 
-This repository contains the implementation of a cloud-native architecture for a research graph application. The project is designed using microservices and follows best practices for scalability, modularity, and maintainability.
+This repository contains the implementation of a cloud-native architecture for a research trends dashboard. The project is designed using microservices and follows best practices for scalability, modularity, and maintainability.
+
+![alt text](pic.png)
 
 ## Table of Contents
 
@@ -22,7 +24,7 @@ This repository contains the implementation of a cloud-native architecture for a
 
 ## Overview
 
-The Research Graph Project is a cloud-native application that enables users to fetch, embed, and cluster research papers from external sources like Arxiv. The application is built using a microservices architecture, with each service handling a specific responsibility.
+The AI Research Trends Dashboard is a cloud-native application that enables users to fetch, embed, and cluster research papers from external sources like Arxiv. The application is built using a microservices architecture, with each service handling a specific responsibility.
 
 ---
 
