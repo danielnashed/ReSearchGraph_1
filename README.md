@@ -17,8 +17,6 @@ This repository contains the implementation of a cloud-native architecture for a
   - [Deployment to AWS](#deployment-to-aws)
 - [Environment Variables](#environment-variables)
 - [Technologies Used](#technologies-used)
-- [Contributing](#contributing)
-- [License](#license)
 
 ---
 
@@ -92,7 +90,6 @@ The frontend is a React-based web application built with Next.js and Tailwind CS
    git clone <repository-url>
    cd project3-danielnashed
 
-
 2. **Backend Setup**:
 
 - Navigate to the backend directory.
@@ -102,7 +99,6 @@ The frontend is a React-based web application built with Next.js and Tailwind CS
 - Run each service locally using uvicorn:
     ```bash
     uvicorn app.main:app --host 0.0.0.0 --port <port>
-
 
 3. **Frontend Setup**:
 
@@ -148,7 +144,7 @@ Frontend:
 Backend:
 - FastAPI
 - MongoDB (via Beanie ODM)
-- AWS (ECS, SQS, EventBridge, Bedrock)
+- AWS (ECS, Fargate, SQS, EventBridge, API Gateway, Bedrock, Amplify)
 
 Other:
 - Docker
